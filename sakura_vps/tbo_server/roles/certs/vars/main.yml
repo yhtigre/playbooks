@@ -1,0 +1,13 @@
+---
+####
+## Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+#####
+
+certbot_install_set:
+  - { name: "certbot" }
+
+webroot_path:  "/var/www/app/public"
+email_address: "ssl@example.org"
+
+ssl_valid_files:
+  - { name: "/etc/httpd/conf.d/app.conf" }

@@ -1,0 +1,57 @@
+---
+####
+# Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+####
+
+- name: 開発ユーティリティの導入
+  yum: name={{ item.name }} state=latest
+  with_items:
+    - "{{ utils_pkg }}"
+  become: True
+
+- name: rbenvの導入
+  git: repo={{ rbenv_install_set }} dest=/usr/local/rbenv
+  become: True
+
+- name: ruby-buildの導入
+  git: repo={{ ruby_build_install_set }} dest=/usr/local/rbenv/plugins/ruby-build
+  become: True
+
+- name: httpdにRoR環境のPATHを追加する
+  copy: src=files/etc/sysconfig/httpd dest=/etc/sysconfig/httpd owner=root group=root mode=644
+  become: True
+
+- name: rbenv.shを配置
+  copy: src=files/etc/profile.d/rbenv.sh dest=/etc/profile.d/rbenv.sh owner=root group=root mode=644
+  become: True
+
+- name: Rubyが導入されているかチェック
+  command: rbenv version
+  register: existance
+  become: True
+  become_flags: "-i"
+  changed_when: no
+
+- name: RoR環境{{ ruby_version }}を構築
+  shell: rbenv install {{ ruby_version }} && rbenv global {{ ruby_version }} && gem install bundler && gem install passenger
+  when: ruby_version not in existance.stdout
+  become: True
+  become_flags: "-i"
+
+- name: Passengerの導入
+  command: passenger-install-apache2-module --auto
+  become: True
+  become_flags: "-i"
+
+- name: Passenger向けにhttpd PrivateTmpを無効化 - 1
+  command: creates=/etc/systemd/system/httpd.service cp /usr/lib/systemd/system/httpd.service /etc/systemd/system/httpd.service
+  become: True
+
+- name: Passenger向けにhttpd PrivateTmpを無効化 - 2
+  lineinfile:
+    path: /etc/systemd/system/httpd.service
+    state: present
+    backrefs: yes
+    regexp: '^PrivateTmp=true$'
+    line: 'PrivateTmp=false'
+  become: True

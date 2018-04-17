@@ -1,0 +1,47 @@
+---
+####
+# Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+####
+
+- name: LAN向けIPアドレスを付与
+  command: nmcli connection modify "System eth1" ipv4.method manual ipv4.address {{ lan_ipaddress_with_cidr }}
+  become: True
+
+- name: LAN向けNICを自動接続設定
+  command: nmcli connection modify "System eth1" connection.autoconnect yes
+  become: True
+
+- name: LAN向けNICをtrustedゾーンに変更
+  command: nmcli connection modify "System eth1" connection.zone trusted
+  become: True
+
+- name: dhcpv6-clientサービスを閉塞
+  firewalld: zone=public service=dhcpv6-client permanent=true state=disabled immediate=true
+  become: True
+
+- name: http、httpsサービスを開放
+  firewalld: zone=public service={{ item.name }} permanent=true state=enabled immediate=true
+  with_items:
+    - { name: http }
+    - { name: https }
+  become: True
+
+- name: LAN {{ service_lan_sw }} 、loopbackの通信を開放
+  firewalld: zone=trusted source={{ item.addr }} permanent=true state=enabled immediate=true
+  with_items:
+    - { addr: "{{ service_lan_sw }}" }
+    - { addr: 127.0.0.1 }
+  become: True
+
+- name: firewalldのバグ(RH Bugzilla Bug 1479951)に対応 - 1
+  stat: path={{ item.name }}
+  with_items: 
+    - "{{ firewalld_xml_files }}"
+  register: existance
+
+- name: firewalldのバグ(RH Bugzilla Bug 1479951)に対応 - 2
+  command: mv {{ item.item.name }} {{ item.item.name }}.bad
+  when: item.stat.exists
+  with_items: "{{ existance.results }}"
+  notify: restart-firewalld
+  become: True

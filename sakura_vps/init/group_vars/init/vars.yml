@@ -1,0 +1,4 @@
+---
+shadow_password01: "{{ vault_password01 }}"
+shadow_password02: "{{ vault_password02 }}"
+ansible_ssh_pass:  "{{ vault_password03 }}"

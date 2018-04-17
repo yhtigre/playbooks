@@ -1,0 +1,22 @@
+---
+####
+# Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+####
+
+- name: 監視用ディレクトリの作成 - {{ monitor_directory }}
+  copy: src=files/{{ monitor_directory }} dest=/var/www/html
+  become: True
+
+- name: アプリ用ディレクトリの作成 - {{ apps_directory }}
+  copy: src=files/{{ apps_directory }} dest=/home owner=admin group=users
+  become: True
+
+- name: ~admin HOME {{ apps_directory }} の権限変更
+  file: path={{ apps_directory }} mode=755
+  become: True
+
+- name: シンボリックリンクの作成 - /var/www/app
+  file: src={{ item.src }} dest={{ item.dst }} state=link
+  with_items:
+    - "{{ symlinks }}"
+  become: True

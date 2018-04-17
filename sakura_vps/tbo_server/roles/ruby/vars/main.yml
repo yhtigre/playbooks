@@ -1,0 +1,18 @@
+---
+####
+## Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+#####
+
+utils_pkg:
+  - { name: openssl-devel }
+  - { name: readline-devel }
+  - { name: zlib-devel }
+  - { name: httpd }
+  - { name: httpd-devel }
+  - { name: curl-devel }
+  - { name: apr-devel }
+  - { name: apr-util-devel }
+
+rbenv_install_set:      "https://github.com/sstephenson/rbenv.git"
+ruby_build_install_set: "https://github.com/sstephenson/ruby-build.git"
+ruby_version:           "2.4.2"

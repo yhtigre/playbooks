@@ -1,0 +1,8 @@
+####
+## Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+#####
+
+---
+- name: reload-httpd
+  service: name=httpd state=reloaded
+  become: True

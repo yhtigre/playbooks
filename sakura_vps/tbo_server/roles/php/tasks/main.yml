@@ -1,0 +1,40 @@
+---
+####
+# Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+####
+
+- name: Remiリポジトリの導入
+  yum: name={{ item.name }} state=latest
+  with_items:
+    - "{{ remi_repo_install_set }}"
+  become: True
+
+- name: PHP5.6の導入
+  yum: name={{ item.name }} state=latest enablerepo=remi,remi-php56
+  with_items:
+    - "{{ php56_install_set }}"
+  become: True
+
+- name: phpMyAdminの導入
+  yum: name={{ item.name }} state=latest enablerepo=remi,remi-php56
+  with_items:
+    - "{{ phpmyadmin_install_set }}"
+  become: True
+
+- name: PHP用ディレクトリを作成
+  file: path={{ item.name }} state=directory owner=mysql group=mysql mode=755
+  with_items:
+    - "{{ php56_conf_directories }}"
+  become: True
+
+- name: PHPログローテート設定
+  copy: src=files/etc/logrotate.d/php dest=/etc/logrotate.d/php owner=root group=root mode=644
+  become: True
+
+- name: php.ini を配置
+  copy: src=files/etc/php.ini dest=/etc/php.ini owner=root group=root mode=644
+  become: True
+
+- name: php.d/01-opcache.ini を配置
+  copy: src=files/etc/php.d/10-opcache.ini dest=/etc/php.d/10-opcache.ini owner=root group=root mode=644
+  become: True

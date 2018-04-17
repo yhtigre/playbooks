@@ -1,0 +1,14 @@
+---
+####
+# Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+#
+# インスタンス起動後のroot権限による初期設定。
+#
+####
+
+- name: インスタンス生成後の共通初期設定
+  gather_facts: False
+  hosts: init
+
+  roles:
+    - init

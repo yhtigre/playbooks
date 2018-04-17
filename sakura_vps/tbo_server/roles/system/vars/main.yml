@@ -1,0 +1,21 @@
+---
+####
+## Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+#####
+
+disable_services:
+  - { name: rngd.service }
+  - { name: abrt-ccpp.service }
+  - { name: abrt-oops.service }
+  - { name: abrt-vmcore.service }
+  - { name: abrt-xorg.service }
+  - { name: dmraid-activation.service }
+  - { name: libstoragemgmt.service }
+  - { name: mdmonitor.service }
+  - { name: smartd.service }
+
+utils_pkg:
+  - { name: lv }
+  - { name: w3m }
+  - { name: expect }
+  - { name: MySQL-python }

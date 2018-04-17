@@ -1,0 +1,10 @@
+---
+####
+## Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+#####
+
+monitor_directory: "/var/www/html/sr"
+apps_directory:    "/home/admin"
+
+symlinks:
+  - { src: "{{ apps_directory }}/app", dst: "/var/www/app" }

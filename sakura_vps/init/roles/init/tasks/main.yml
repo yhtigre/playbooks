@@ -1,0 +1,37 @@
+---
+####
+# Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+####
+
+- name: known_hostsから対象ホストのフィンガープリントを削除
+  local_action: shell ssh-keygen -R {{ inventory_hostname }}
+
+- name: yum update の実行
+  yum: name=* state=latest
+  when: do_yum_update == True
+
+- name: 作業ユーザアカウントの作成
+  user: name={{ item.name }} uid={{ item.uid }} group={{ item.grp }} password={{ item.passwd }}
+  with_items:
+    - "{{ user_accounts }}"
+
+- name: 作業ユーザアカウントの公開鍵登録
+  authorized_key: user={{item.name}} key={{lookup("file", item.key)}}
+  with_items:
+    - "{{ user_publickeys }}"
+
+- name: sudoers設定
+  lineinfile: dest=/etc/sudoers.d/001_local state=present regexp={{item.name}} line="{{item.line}}" owner=root group=root mode=440 create=yes
+  with_items:
+    - "{{ sudoers }}"
+
+- name: sshdのアクセス方式を変更
+  template: src=templates/etc/ssh/sshd_config dest=/etc/ssh/sshd_config owner=root group=root mode=600
+
+- name: サーバの再起動
+  shell: sleep 2 && shutdown -r now "Ansible updates triggered."
+  async: 1
+  poll: 0
+
+- name: サーバ再起動の完了
+  local_action: wait_for host={{ inventory_hostname }} port={{ ansible_ssh_port }} delay=30 timeout=300

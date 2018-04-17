@@ -1,0 +1,9 @@
+---
+####
+## Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+#####
+
+firewalld_xml_files:
+  - { name: "/usr/lib/firewalld/icmptypes/beyond-scope.xml" }
+  - { name: "/usr/lib/firewalld/icmptypes/failed-policy.xml" }
+  - { name: "/usr/lib/firewalld/icmptypes/reject-route.xml" }

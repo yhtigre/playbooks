@@ -1,0 +1,17 @@
+---
+ansible_become_pass:           "{{ vault_password01 }}"
+mysql_user_backup_password:    "{{ vault_password02 }}"
+mysql_user_benchmark_password: "{{ vault_password03 }}"
+mysql_user_zabbix_password:    "{{ vault_password04 }}"
+mysql_user_app_password:       "{{ vault_password05 }}"
+
+ansible_ssh_user:               admin
+ansible_ssh_port:               22
+ansible_ssh_private_key_file:   "/home/admin/.ssh/admin.pem"
+
+hostname:                       "web01.localdomain"
+service_lan_sw:                 192.168.120.0/24
+lan_ipaddress:                  192.168.120.11
+lan_ipaddress_with_cidr:        "{{ lan_ipaddress }}/24"
+
+app_servername:                 "example.org"

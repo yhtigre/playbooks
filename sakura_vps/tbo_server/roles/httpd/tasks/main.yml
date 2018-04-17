@@ -1,0 +1,47 @@
+---
+####
+# Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+####
+
+- name: Apache2.4の導入
+  yum: name={{ item.name }} state=latest
+  with_items:
+    - "{{ httpd24_install_set }}"
+  become: True
+
+- name: Apache用コンフィグを配置
+  template: src={{ item.src }} dest={{ item.dst }} owner=root group=root mode=644
+  with_items:
+    - "{{ httpd24_conf_files }}"
+  become: True
+
+- name: 不要なApache用コンフィグを別ディレクトリへ移動 - 1
+  file: path=/etc/httpd/conf.d/_save_ state=directory owner=root group=root mode=755
+  become: True
+
+- name: 不要なApache用コンフィグを別ディレクトリへ移動 - 2
+  stat: path={{ item.name }}
+  with_items:
+    - "{{ httpd24_ignore_conf }}"
+  register: existance
+  changed_when: no
+
+- name: 不要なApache用コンフィグを別ディレクトリへ移動 - 3
+  command: mv {{ item.item.name }} /etc/httpd/conf.d/_save_
+  when: item.stat.exists
+  with_items: "{{ existance.results }}"
+  become: True
+
+- name: 不要なApache用コンフィグを削除
+  file: path={{ item.name }} state=absent
+  with_items:
+    - "{{ httpd24_remove_conf }}"
+  become: True
+
+- name: /var/log/httpdの権限変更
+  file: path=/var/log/httpd mode=755
+  become: True
+
+- name: Apacheの起動(自動起動設定含む)
+  service: name=httpd enabled=yes state=started
+  become: True

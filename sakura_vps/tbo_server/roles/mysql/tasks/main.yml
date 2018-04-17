@@ -1,0 +1,58 @@
+---
+####
+# Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+####
+
+- name: MySQL5.7の導入
+  yum: name={{ item.name }} state=latest
+  with_items:
+    - "{{ mysql57_install_set }}"
+  become: True
+
+- name: MySQL用ディレクトリを作成
+  file: path={{ item.name }} state=directory owner=mysql group=mysql mode=755
+  with_items:
+    - "{{ mysql57_conf_directories }}"
+  become: True
+
+- name: my.cnf を配置
+  copy: src=files/etc/my.cnf dest=/etc/my.cnf owner=root group=root mode=644
+  become: True
+
+- name: MySQLの起動(自動起動設定含む)
+  service: name=mysqld enabled=yes state=started
+  become: True
+
+- name: MySQLの初期rootパスワードを調査
+  shell: grep 'temporary password is generated' /var/log/mysqld.log* | awk '{print $NF}'
+  register: mysql_root_password
+  changed_when: no
+
+- name: mysql_secure_installationを実行
+  script: files/tmp/auto_mysqlsecureinstallation.sh "{{ mysql_root_password.stdout }}"
+
+- name: mysql_config_editorを実行
+  script: files/tmp/auto_mysqlconfigeditor.sh mysqladmin root "{{ mysql_root_password.stdout }}" localhost
+  become: True
+
+- name: MySQLユーザを作成
+  mysql_user:
+    login_user: root
+    login_password: "{{ mysql_root_password.stdout }}"
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    host: "{{ item.host }}"
+    priv: "{{ item.priv }}"
+    state: present
+  with_items:
+    - "{{ mysql57_accounts }}"
+
+- name: MySQLデータベースを作成
+  command: mysql --login-path=mysqladmin -e "create database if not exists {{ item.name }}"
+  with_items:
+    - "{{ mysql57_databases }}"
+  become: True
+
+- name: MySQLログローテート設定
+  copy: src=files/etc/logrotate.d/mysql dest=/etc/logrotate.d/mysql owner=root group=root mode=644
+  become: True

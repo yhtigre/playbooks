@@ -1,0 +1,20 @@
+---
+####
+# Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+#
+# WEB+DBサーバの構築プレイブック。
+#
+####
+
+- name: WEB+DBサーバ構築
+  gather_facts: False
+  hosts: tbo_server
+
+  roles:
+    - { role: system,  tags: system  }
+    - { role: network, tags: network }
+    - { role: mysql,   tags: mysql   }
+    - { role: php,     tags: php     }
+    - { role: apps,    tags: apps    }
+    - { role: httpd,   tags: httpd   }
+    - { role: certs,   tags: certs   }

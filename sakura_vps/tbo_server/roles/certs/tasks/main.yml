@@ -1,0 +1,46 @@
+---
+####
+# Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+####
+
+- name: Let's Encrypt certbotクライアントツールの導入
+  yum: name={{ item.name }} state=latest
+  with_items:
+    - "{{ certbot_install_set }}"
+  become: True
+
+- name: CommonName {{ app_servername }} の正引き検査
+  fail: msg="DNS登録後に再実行してください"
+  when:
+    - lookup('dig', app_servername) == "NXDOMAIN"
+  tags: debug
+
+- name: サーバ証明書の存在検査
+  stat: path=/etc/letsencrypt/live/{{ app_servername }}/cert.pem
+  register: certfile
+  become: True
+
+- name: サーバ証明書の取得
+  command: certbot certonly --non-interactive --agree-tos --webroot -w {{ webroot_path }} -d {{ app_servername }} --email {{ email_address }}
+  when: not certfile.stat.exists
+  become: True
+
+- name: 仮想ホスト {{ app_servername }} のSSLディレクティブを有効化
+  replace: dest={{ item.name }} regexp='##########' replace=''
+  with_items:
+    - "{{ ssl_valid_files }}"
+  notify: reload-httpd
+  become: True
+
+- name: サーバ証明書自動更新時にhttpdをリロードする設定 - 1
+  lineinfile:
+    path: /etc/sysconfig/certbot
+    state: present
+    backrefs: yes
+    regexp: '^RENEW_HOOK=""$'
+    line: RENEW_HOOK="--renew-hook 'systemctl reload httpd'"
+  become: True
+
+- name: サーバ証明書自動更新時にhttpdをリロードする設定 - 2
+  systemd: name=certbot-renew.timer enabled=yes state=started
+  become: True

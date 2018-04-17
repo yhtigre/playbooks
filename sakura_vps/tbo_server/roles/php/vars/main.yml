@@ -1,0 +1,22 @@
+---
+####
+## Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+#####
+
+remi_repo_install_set:
+  - { name: "http://rpms.famillecollet.com/enterprise/remi-release-7.rpm" }
+
+php56_install_set:
+  - { name: "php" }
+  - { name: "php-opcache" }
+  - { name: "php-devel" }
+  - { name: "php-mbstring" }
+  - { name: "php-mcrypt" }
+  - { name: "php-mysqlnd" }
+  - { name: "php-intl" }
+
+php56_conf_directories:
+  - { name: "/var/log/php" }
+
+phpmyadmin_install_set:
+  - { name: "phpmyadmin" }

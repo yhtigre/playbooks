@@ -1,0 +1,44 @@
+---
+####
+# Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+####
+
+- name: ホスト名を変更
+  hostname: name={{ hostname }}
+  become: True
+
+- name: SAR取得間隔を変更
+  lineinfile:
+    path: /etc/cron.d/sysstat
+    state: present
+    backrefs: yes
+    regexp: '^\*\/10 \* \* \* \* root \/usr\/lib64\/sa\/sa1 1 1$'
+    line: '*/1 * * * * root /usr/lib64/sa/sa1 1 1'
+  become: True
+
+- name: Postfix IPv6を無効化
+  lineinfile:
+    path: /etc/postfix/main.cf
+    state: present
+    backrefs: yes
+    regexp: '^inet_protocols = all$'
+    line: 'inet_protocols = ipv4'
+  notify: reload-postfix
+  become: True
+ 
+- name: 不要サービス群を停止
+  service: name={{ item.name }} enabled=no state=stopped
+  with_items:
+    - "{{ disable_services }}"
+  become: True
+
+- name: 開発ユーティリティ群の導入
+  yum: name={{ item.name }} state=latest
+  with_items:
+    - "{{ utils_pkg }}"
+  become: True
+
+- name: crondから出力される余分なsystemdメッセージを抑制
+  copy: src=files/etc/rsyslog.d/ignore-systemd-session-slice.conf dest=/etc/rsyslog.d/ owner=root group=root mode=644
+  notify: restart-rsyslog
+  become: True

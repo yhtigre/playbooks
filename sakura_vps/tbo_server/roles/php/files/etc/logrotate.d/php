@@ -1,0 +1,7 @@
+/var/log/php/*.log {
+  create 644 apache apache
+  missingok
+  daily
+  compress
+  rotate 30
+}

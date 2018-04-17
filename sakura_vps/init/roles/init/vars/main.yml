@@ -1,0 +1,18 @@
+---
+####
+## Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+#####
+
+service_lan_sw: 192.168.120.0/24
+ansible_ssh_user: root
+ansible_ssh_port: 22
+do_yum_update: True
+
+user_accounts:
+  - { name: "admin", uid: 501, grp: "users", passwd: "{{ shadow_password01 }}" }
+
+user_publickeys:
+  - { name: "admin", key: "files/home/admin/.ssh/authorized_keys" }
+
+sudoers:
+  - { name: "admin", line: "yh ALL=(ALL) ALL" }

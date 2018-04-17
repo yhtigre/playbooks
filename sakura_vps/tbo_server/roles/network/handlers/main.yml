@@ -1,0 +1,8 @@
+####
+## Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+#####
+
+---
+- name: restart-firewalld
+  service: name=firewalld state=restarted
+  become: True

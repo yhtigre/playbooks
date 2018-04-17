@@ -1,0 +1,28 @@
+---
+####
+# Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+####
+
+- name: Zabbixエージェント3.0の導入
+  yum: name={{ item.name }} state=latest
+  with_items:
+    - "{{ zabbix30_install_set }}"
+  become: True
+
+- name: Zabbix用ディレクトリを作成
+  file: path={{ item.name }} state=directory owner=zabbix group=zabbix mode=755
+  with_items:
+    - "{{ zabbix30_conf_directories }}"
+  become: True
+
+- name: zabbix_agentd.confを配置
+  template: src=templates/etc/zabbix/zabbix_agentd.conf dest=/etc/zabbix/zabbix_agentd.conf owner=root group=root mode=644
+  become: True
+
+- name: zabbix_agentd.d/ zabbix_custom.d/ を配置
+  copy: src=files/etc/zabbix dest=/etc owner=root group=root
+  become: True
+
+- name: Zabbixエージェントの起動(自動起動設定含む)
+  service: name=zabbix-agent enabled=yes state=started
+  become: True

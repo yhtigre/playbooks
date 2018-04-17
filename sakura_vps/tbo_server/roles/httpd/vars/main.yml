@@ -1,0 +1,25 @@
+---
+####
+## Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+#####
+
+zabbix_server_global:   y.y.y.y
+from_office:            z.z.z.z
+
+httpd24_install_set:
+  - { name: "httpd" }
+  - { name: "mod_ssl" }
+
+httpd24_conf_files:
+  - { src: "templates/etc/httpd/conf/httpd.conf",           dst: "/etc/httpd/conf"   }
+  - { src: "templates/etc/httpd/conf.d/_sr.conf",           dst: "/etc/httpd/conf.d" }
+  - { src: "templates/etc/httpd/conf.d/_ssl.conf",          dst: "/etc/httpd/conf.d" }
+  - { src: "templates/etc/httpd/conf.d/app.conf",           dst: "/etc/httpd/conf.d" }
+  - { src: "templates/etc/httpd/conf.d/phpMyAdmin.conf",    dst: "/etc/httpd/conf.d" }
+
+httpd24_remove_conf:
+  - { name: "/etc/httpd/conf.d/ssl.conf" }
+
+httpd24_ignore_conf:
+  - { name: "/etc/httpd/conf.d/autoindex.conf" }
+  - { name: "/etc/httpd/conf.d/welcome.conf" }

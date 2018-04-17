@@ -1,0 +1,12 @@
+####
+## Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+#####
+
+---
+- name: reload-postfix
+  service: name=postfix state=reloaded
+  become: True
+
+- name: restart-rsyslog
+  service: name=rsyslog state=restarted
+  become: True

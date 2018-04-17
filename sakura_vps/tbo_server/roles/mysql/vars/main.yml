@@ -1,0 +1,41 @@
+---
+####
+## Copyright (c) 2018 TATEIWA-SHACHU, LLC. All rights reserved.
+#####
+
+mysql57_install_set:
+  - { name: "http://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm" }
+  - { name: "mysql-community-server" }
+  - { name: "mysql-community-devel" }
+
+mysql57_conf_directories:
+  - { name: "/var/log/mysql" }
+  - { name: "/var/log/mysql/general" }
+  - { name: "/var/log/mysql/binlog" }
+  - { name: "/var/log/mysql/slow" }
+  - { name: "/var/log/mysql/redo" }
+  - { name: "/var/lib/innodb" }
+
+mysql57_accounts:
+  - name: backup
+    password: "{{ mysql_user_backup_password }}"
+    priv: "*.*:select,reload,super,lock tables,replication client,show view"
+    host: 192.168.120.31
+
+  - name: benchmark
+    password: "{{ mysql_user_benchmark_password }}"
+    priv: "benchmark.*:all"
+    host: 192.168.120.31
+
+  - name: zabbix
+    password: "{{ mysql_user_zabbix_password }}"
+    priv: "zabbix.*:all"
+    host: localhost
+
+  - name: app
+    password: "{{ mysql_user_app_password }}"
+    priv: "`app-production`.*:all"
+    host: localhost
+
+mysql57_databases:
+  - { name: '`app-production`' }
