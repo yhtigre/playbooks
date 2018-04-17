@@ -15,4 +15,4 @@ user_publickeys:
   - { name: "admin", key: "files/home/admin/.ssh/authorized_keys" }
 
 sudoers:
-  - { name: "admin", line: "yh ALL=(ALL) ALL" }
+  - { name: "admin", line: "admin ALL=(ALL) ALL" }
