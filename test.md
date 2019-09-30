@@ -15,8 +15,8 @@ devel-single/
     ├── group_vars
     │   └── init
     │       ├── vars.yml
-    │       └── vault.yml
-    ├── hosts
+    │       └── vault.yml            vault_password02 へrootのパスワードを記述する
+    ├── hosts                        サーバのIPアドレスを記述する
     ├── init.yml
     └── roles
         └── init
